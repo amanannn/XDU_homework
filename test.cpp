@@ -1,42 +1,59 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+#include <queue>
+#include <set>
+#include <vector>
+using namespace std;
 
-int* plusOne(int* digits, int digitsSize, int* returnSize) {
-    for (int i = digitsSize - 1;i >= 0;i--){
-        if (digits[i] != 9){
-            digits[i]++;
-            *returnSize = digitsSize;
-            int *result = (int *)malloc(digitsSize * sizeof(int));
-            for (int j = 0;j < digitsSize;j++){
-                result[j] = digits[j];
+int main() {
+    int n, k;
+    cin >> n >> k;
+    
+    int x, y;
+    cin >> x >> y;
+    
+    // 8个方向的移动
+    int dx[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int dy[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    
+    set<pair<int, int>> visited;
+    queue<vector<int>> q; // {x, y, steps}
+    
+    q.push({x, y, 0});
+    
+    while (!q.empty()) {
+        auto curr = q.front();
+        q.pop();
+        
+        int curr_x = curr[0], curr_y = curr[1], steps = curr[2];
+        
+        // 如果已访问过，跳过
+        if (visited.count({curr_x, curr_y})) {
+            continue;
+        }
+        
+        // 标记为已访问
+        visited.insert({curr_x, curr_y});
+        
+        // 如果还没达到步数限制，继续扩展
+        if (steps < k) {
+            for (int i = 0; i < 8; i++) {
+                int new_x = curr_x + dx[i];
+                int new_y = curr_y + dy[i];
+                
+                // 检查边界和是否已访问
+                if (new_x >= 1 && new_x <= n && 
+                    new_y >= 1 && new_y <= n && 
+                    !visited.count({new_x, new_y})) {
+                    q.push({new_x, new_y, steps + 1});
+                }
             }
-            return result;
-        }else{
-            digits[i] = 0;
         }
     }
-
-    *returnSize = digitsSize + 1;
-    int *result = (int *)malloc((digitsSize + 1) * sizeof(int));
-    result[0] = 1;
-    for (int i = 1;i < digitsSize+1;i++){
-        result[i] = 0;
-    }
-    return result;
+    
+    cout << visited.size() << endl;
+    
+    return 0;
 }
 
-int main()
-{
-	int n;
-	scanf("%d",&n);
-	int digits[n];
-	int returnSize;
-	for (int i = 0;i < n;i++){
-		scanf("%d",&digits[i]);
-	}
-	int *result = plusOne(digits,n,&returnSize);
-	for (int i = 0;i < returnSize;i++){
-		printf("%d",result[i]);
-	}
-	return 0;
-}
+
+
